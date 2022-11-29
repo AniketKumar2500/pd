@@ -21,7 +21,7 @@ pd or process data is a library written in Csq and provided the features to do d
   > print(df.describe())
 
 
-## Methods
+## Methods in dframe
 <li>mean()</li>
 <li>median()</li>
 <li>mode()</li>
@@ -31,3 +31,9 @@ pd or process data is a library written in Csq and provided the features to do d
 <li>rename()</li>
 <li>add()</li>
 <li>describe()</li>
+
+## Methods in read
+<li>read_csv()</li>
+## Methods in encode
+<li>label_encode()</li>
+<li>ordinal_encode()</li>
