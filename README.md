@@ -34,6 +34,7 @@ pd or process data is a library written in Csq and provided the features to do d
 
 ## Methods in read
 <li>read_csv()</li>
+
 ## Methods in encode
 <li>label_encode()</li>
 <li>ordinal_encode()</li>
