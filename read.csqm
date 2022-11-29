@@ -1,0 +1,165 @@
+#if !defined(FILEH_CSQM)
+#define FILEH_CSQM
+
+    #include "dframe.csqm"
+
+    //Define exception related to file.
+    namespace exception{
+        class file_path_exception{
+            public:
+                file_path_exception(){}
+                def thr(){
+                    error("file_path_exception","File not found!");
+                }
+        };
+    }
+    def raise(exception::file_path_exception fpe){fpe.thr();}
+
+    void replace(char str[], char sub[], char nstr[])
+
+    {
+
+        int strLen, subLen, nstrLen;
+
+        int i = 0, j, k;
+
+        int flag = 0, start, end;
+
+        strLen = strlen(str);
+
+        subLen = strlen(sub);
+
+        nstrLen = strlen(nstr);
+
+        for (i = 0; i < strLen; i++)
+
+        {
+
+            flag = 0;
+
+            start = i;
+
+            for (j = 0; str[i] == sub[j]; j++, i++)
+
+                if (j == subLen - 1)
+
+                    flag = 1;
+
+            end = i;
+
+            if (flag == 0)
+
+                i -= j;
+
+            else
+            {
+                for (j = start; j < end; j++)
+
+                {
+
+                    for (k = start; k < strLen; k++)
+
+                        str[k] = str[k + 1];
+
+                    strLen--;
+
+                    i--;
+                }
+
+                for (j = start; j < start + nstrLen; j++)
+
+                {
+
+                    for (k = strLen; k >= j; k--)
+
+                        str[k + 1] = str[k];
+
+                    str[j] = nstr[j - start];
+
+                    strLen++;
+
+                    i++;
+                }
+            }
+        }
+    }
+
+    //This function will tokenize the string using strtok a built-in function in C.
+    def tokenize_(str ln,str tok_ = ","){
+        ln.pop_bk();
+        array<str> s;
+        
+        // ln+=", ";
+        char * token = strtok(ln.Str, tok_.Str);
+        while(token != NULL){
+            s.add(str(token).replace(str("\n,").Str,str("").Str));
+            token = strtok(NULL, tok_.Str);
+        }
+        return s;
+    }
+    struct args_read_csv{
+        int col_len = 1000;
+        str delim = ",";
+
+    };
+    def read_csv(const char* file_name,args_read_csv arc = {.col_len = 1000, .delim =","}){
+        char ln[arc.col_len];
+        FILE *f = NULL;
+        // str ret;
+        array<array<str>> ret;
+        f = fopen(file_name,"r+");
+
+        if(f == NULL){
+            /*If file opening fails return from here itself*/
+            printf("Error, Can't open file\n");
+        }
+
+        /*File is opened. Start reading the file line by line*/
+        while ( fgets ( ln, arc.col_len, f) != NULL)
+        {
+            // replace(ln2,str("\n").Str,str("").Str);
+            str ln1 = ln;
+            ln1+=" ";
+            ln1.pop_bk();
+
+            ret.add(tokenize_(ln1,arc.delim));
+        }
+
+        //Columns
+        array<str> col = ret[0];
+        dict<str,array<str>> d;
+        for(int i=0;i<col.len();i++){
+            array<str> c;
+            for(var j : ret(2,ret.len(),1)){
+                c.add(j[i]);
+            }
+            d.add(col[i],c);
+        }
+        /*close the file*/
+        fclose (f);
+        return dframe(d);
+        // return (ret);
+    }
+
+
+    //
+    // def read_csv(str path,int column_len = 100000){
+    //     // print(read(path.Str,column_len));
+    //     // read(path.Str,column_len);
+    //     var v = read(path.Str,column_len);
+    //     array<array<str>> tok;
+    //     for(var i : v)
+    //         tok.add(tokenize_(i.replace(str("\n").Str,str("").Str)));
+    //     array<str> col = tok[0];
+    //     // dict<str,array<str>> df;
+    //     dict<str,array<str>> d;
+    //     for(int i=0;i<col.len();i++){
+    //         array<str> c;
+    //         for(var j : tok(2,tok.len(),1)){
+    //             c.add(j[i]);
+    //         }
+    //         d.add(col[i],c);
+    //     }
+    //     return d;
+    // }
+#endif // FILEH_CSQM 

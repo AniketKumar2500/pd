@@ -1,0 +1,15 @@
+#if !defined(SPLIT_CSQM)
+#define SPLIT_CSQM
+    //This method will split data into training and testing data which is useful in 
+    def train_test_split(array<double> input_,int train){
+        array<double> train_,test_;
+        for(int i=0;i<train;i++){
+            train_+=input_[i];
+        }
+        for(int i=train;i<input_.len();i++){
+            test_+=input_[i];
+        }
+        return array<array<double>>({train_,test_});
+    }
+
+#endif // SPLIT_CSQM

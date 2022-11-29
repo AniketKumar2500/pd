@@ -1,0 +1,58 @@
+#if !defined(ENCODE_CSQM)
+#define ENCODE_CSQM
+
+    #include "dframe.csqm"
+
+    namespace exception{
+        class feature_error{
+            public:
+                int provided, needed;
+                feature_error(int provided, int needed){this->needed = needed;this->provided = provided;}
+                def geterror(){
+                    str err = "failed to extract features\n provided ";
+                    err += tostr(provided) + " features, but need ";
+                    err += tostr(needed);
+                    error("feature_error",err.Str);
+                }
+        };
+    }
+    //overload raise function
+    def raise(exception::feature_error fe){
+        fe.geterror();
+    }
+
+    def label_encode(array<int> data){
+        var d = data;
+        int ind = 0;
+        for(var i : d.unique()){
+            d.replace(i,ind);
+        }
+        return d;
+    }
+
+    def label_encode(array<str> data){
+        var d = data;
+        int ind = 0;
+        for(var i : d.unique()){
+            d.replace(i,tostr(ind));
+            ind++;
+        }
+        return d;
+    }
+
+    def label_encode(array<double> data){
+        var d = data;
+        int ind = 0;
+        for(var i : d.unique()){
+            d.replace(i,(ind));
+            ind++;
+        }
+        return d;
+    }
+
+    def ordinal_encode(array<str> data, array<str> features){
+        if(features.len() != data.unique().len()){
+            raise(exception::feature_error(features.len(),data.unique().len()));
+        }
+    }
+#endif // ENCODE_CSQM

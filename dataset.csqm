@@ -1,0 +1,18 @@
+#if !defined(DATASET_CSQM)
+#define DATASET_CSQM
+
+    #include "read.csqm"
+
+    namespace data{
+        def iris();
+        def heart();
+        array<str> dataset_names = {"heart","iris"};
+    }
+
+    //Declaration 
+    #if __linux
+        def data::iris(){return read_csv("pd/data/iris.csv");} 
+        def data::heart(){return read_csv("pd/data/heart.csv");}
+    #endif
+
+#endif // GETDATA_CSQM

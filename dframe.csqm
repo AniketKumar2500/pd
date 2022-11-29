@@ -1,0 +1,205 @@
+#if !defined(DFRAME_CSQM)
+#define DFRAME_CSQM
+
+    #include "/media/aniket/disk/Csq/Modules/fmt/builtins.csqm"
+
+    //Version of dframe
+    #define __dframe_version 1
+    
+    //Class dataframe:::::
+    //This class is the core of this module "Used to work with dataframes.".
+    class dframe{
+        public:
+            //Dictionary which stores dataframe.
+            dict<str,array<str>> data;
+            //Columns
+            array<str> columns;
+            //**********************consturctors****************
+            //Consturctor for no argument passed.
+            constructor(dframe)(){}
+            //Consturctor for dict<str,array<str>> passed.
+            constructor(dframe)(dict<str,array<str>> data){
+                int s = data[data.keys[0]].len();
+                for(var i : data.keys){
+                    if(s != data[i].len()){
+                        raise(exception::data_len_exception());
+                    }
+                }
+                //assigning given dictionary to data dictionary(property of class dframe).
+                this->data = data;
+                this->columns = data.keys;
+            }
+            //Consturctor for dict<str,array<int>> passed.
+            constructor(dframe)(dict<str,array<int>> data){
+                int s = data[data.keys[0]].len();
+                //searching for exception.
+                for(var i : data.keys){
+                    if(data[i].len() != s){
+                        raise(exception::data_len_exception());
+                    }
+                    // for(var j : data[])
+                }
+                //assigning given dictionary to data dictionary(property of class dframe).
+                for(var i : data.keys){
+                    //Assigning data into data2 by converting value array into str array.
+                    this->data.add(i,data[i].tostr());
+                }
+                this->columns = data.keys;
+            }
+            //Consturctor for dict<str,array<double>> passed.
+            constructor(dframe)(dict<str,array<double>> data){
+                int s = data[data.keys[0]].len();
+                //searching for exception.
+                for(var i : data.keys){
+                    if(data[i].len() != s){
+                        raise(exception::data_len_exception());
+                    }
+                    // for(var j : data[])
+                }
+                //assigning given dictionary to data dictionary(property of class dframe).
+                for(var i : data.keys){
+                    //Assigning data into data2 by converting value array into str array.
+                    this->data.add(i,data[i].tostr());
+                }
+                this->columns = data.keys;
+            }
+            //Operator to return the data belonging to a specific column.
+            def operator[](str col){return this->data[col];}
+            /*Operator for dataframe assignment
+            @param df dframe
+            */
+            def operator=(const dframe& df){this->data = df.data;this->columns = df.columns;}
+            def operator=(dict<str,array<str>>){this->data = dframe(data).data;this->columns = dframe(data).columns;}
+            def operator=(dict<str,array<int>>){this->data = dframe(data).data;this->columns = dframe(data).columns;}
+            def operator=(dict<str,array<double>>){this->data = dframe(data).data;this->columns = dframe(data).columns;}
+            
+            //method to return the mean of all the columns
+            def mean(){
+                dict<str,double> mean_;
+                for(var i : this->data.keys){
+                    mean_.add(i,this->data[i].todouble().mean());
+                }
+                return mean_;
+            }
+            
+            def median(){
+                dict<str,double> med_;
+                for(var i : this->data.keys){
+                    med_.add(i,this->data[i].todouble().median());
+                }
+                return med_;
+            }
+
+            // //method to return the mean of all the columns
+            def mode(){
+                dict<str,str> mode_;
+                for(var i : this->data.keys){
+                    mode_.add(i,this->data[i].mode());
+                }
+                return mode_;
+            }
+            //This method returns row of data, note you can also pass the index for the row by passing argument index by default it's zero.
+            def getrow(int index = 0){
+                dict<str,str> ret;
+                for(var i : this->data.keys){
+                    ret.add(i,this->data[i][index]);
+                }
+                return ret;
+            }
+            //This method returns a dictionary of first n rows.
+            def head(int n = 5){
+                dict<str,array<str>> d;
+                for(var c : this->columns){
+                    array<str> c_;
+                    for(int i=0;i<n;i++){
+                        c_.add(this->getrow(i)[c]);
+                    }
+                    d.add(c,c_);
+                }
+                return d;
+            }
+            //This method will delete the last column.
+            def pop(){this->data.pop();}
+            //This method will add the column at the last.
+            def add(str col, array<str> d){
+                this->data.add(col,d);
+            }
+            //This method will add the column at the last.
+            def add(str col, array<int> d){
+                this->data.add(col,d.tostr());
+            }
+            //This method will add the column at the last.
+            def add(str col, array<double> d){
+                this->data.add(col,d.tostr());
+            }
+
+            //This method will rename column.
+            def rename(array<str> new_columns){
+                dict<str,array<str>> d(new_columns,data.values);
+                return dframe(d);
+            }
+
+            //This method describes about the data.
+            def describe(){
+                str r = "Mean:\n";
+                r += this->mean().readall() + "\nMedian:\n";
+                r += this->median().readall() + "\nMode:\n";
+                r += this->mode().readall();
+                r += "\nColumns:";
+                r += tostr(this->columns) + "\nLength:";
+                r += tostr(this->data.keys.len()) + " columns x ";
+                r += tostr(this->data.values[0].len()) + " rows";
+                return r;
+            }
+            //This operator describes about data.
+            def operator!(){
+                str r = "Mean:\n";
+                r += this->mean().readall() + "\nMedian:\n";
+                r += this->median().readall() + "\nMode:\n";
+                r += this->mode().readall();
+                r += "\nColumns:";
+                r += tostr(this->columns) + "\nLength:";
+                r += tostr(this->data.keys.len()) + " columns x ";
+                r += tostr(this->data.values[0].len()) + " rows";
+                return r;
+            }
+    };      
+
+    //overload tostr function to make dataframes printable.
+    def tostr(dframe data){
+        array<array<str>> arr_;
+        for(var i : data.data.keys){
+            arr_.add(data.data[i]);
+        }
+        //Inserting values
+        int univ = 0;
+        for(var i : data.data.keys){
+            for(var j : data.data[i]){
+                if(j.len()>univ){
+                    univ = j.len();
+                }
+            }
+        }
+        univ/=2;
+        str s;
+        s+="columns: ";
+        s+="\n";
+        str t;
+        for(var i : data.data.keys){
+            t+=to_str(i)+str(" ")*(univ+1);
+        }
+        s+=t+"\n";
+        for(int i=0;i<t.len();i++){s+="-";}
+        s+="\n";
+        for(int i=0;i<data.data[data.data.keys[0]].len();i++){
+            for(int j=0;j<data.data.keys.len();j++){
+                s+=arr_[j][i]+str("  ")*(univ);
+            }
+            s+="\n";
+        }
+        s+="[ ";
+        s += tostr(data.data.keys.len()) + " columns x ";
+        s += tostr(data.data.values[0].len()) + " rows ]";
+        return s;
+    }
+#endif // DFRAME_CSQM   

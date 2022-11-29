@@ -1,0 +1,13 @@
+#if !defined(ALL_H)
+#define ALL_H
+
+    //Importing all modules so which may effect speed
+    #include "dframe.csqm"
+    #include "split.csqm"
+    #include "read.csqm"
+    #include "dataset.csqm"
+    #if __dframe_version == 1
+        #define __pd_version 1
+    #endif
+
+#endif // ALL_H
